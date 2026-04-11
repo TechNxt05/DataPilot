@@ -59,4 +59,3 @@ Deploying a Heavy AI Python Application requires separating compute from the UI.
 4. Before clicking Deploy, you must update the backend URL inside your Next.js application so the frontend knows where to talk. *(Instead of `http://127.0.0.1:8000`, replace the axios call in `frontend/src/app/page.tsx` with your Render API URL).*
 5. Click **Deploy**.
 
-> Note: To make the URL dynamic without hardcoding it in `page.tsx`, you can add `NEXT_PUBLIC_API_URL=https://your-render-url.onrender.com` in your Vercel Environment Variables, and use `process.env.NEXT_PUBLIC_API_URL` instead!
