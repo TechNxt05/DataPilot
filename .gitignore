@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+.env.local
+
+# Dependency directories
+node_modules/
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+
+# IDE files
+.vscode/
+.idea/
+
+# Logging
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
