@@ -42,20 +42,3 @@ Navigate to `http://localhost:3000`.
 
 Deploying a Heavy AI Python Application requires separating compute from the UI. Vercel Serverless Functions time out after 10-15s on the free tier, which terminates intensive Data Analysis or Regression tasks.
 
-**Recommended Setup:** Deploy Frontend to **Vercel** and Backend to **Render**.
-
-### Step 1: Deploy Backend to Render.com (Free)
-1. Push this repository to GitHub.
-2. Go to [Render.com](https://render.com) and create a **New Web Service**.
-3. Connect your GitHub repository.
-4. **Build Command**: `pip install -r requirements.txt`
-5. **Start Command**: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`
-6. Click Deploy. Once finished, Render will give you a public URL (e.g., `https://datapilot-backend.onrender.com`).
-
-### Step 2: Deploy Frontend to Vercel (Free)
-1. Go to [Vercel.com](https://vercel.com) and click **Add New Project**.
-2. Import your DataPilot repository.
-3. **CRITICAL STEP:** In the project configuration, find **Framework Preset** (ensure it says Next.js) and look for **Root Directory**. Click Edit, and select the `frontend` folder!
-4. Before clicking Deploy, you must update the backend URL inside your Next.js application so the frontend knows where to talk. *(Instead of `http://127.0.0.1:8000`, replace the axios call in `frontend/src/app/page.tsx` with your Render API URL).*
-5. Click **Deploy**.
-
