@@ -36,9 +36,4 @@ npm run dev
 ```
 Navigate to `http://localhost:3000`.
 
----
-
-## ☁️ Deployment Guide (Vercel & Render)
-
-Deploying a Heavy AI Python Application requires separating compute from the UI. Vercel Serverless Functions time out after 10-15s on the free tier, which terminates intensive Data Analysis or Regression tasks.
 
