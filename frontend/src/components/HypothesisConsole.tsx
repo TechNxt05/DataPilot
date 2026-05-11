@@ -6,8 +6,8 @@ import { Lightbulb, ShieldCheck, ShieldAlert, TrendingUp } from 'lucide-react';
 
 interface Hypothesis {
   id: string;
-  statement: str;
-  explanation: str;
+  statement: string;
+  explanation: string;
   confidence: number;
   evidence: string[];
   conflicting_evidence: string[];
