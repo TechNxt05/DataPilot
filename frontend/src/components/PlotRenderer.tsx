@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
 
 type PlotFigure = {
-  data: unknown[];
-  layout?: Record<string, unknown>;
+  data: any[];
+  layout?: Record<string, any>;
 };
 
 export default function PlotRenderer({ figure }: { figure: PlotFigure | null }) {
