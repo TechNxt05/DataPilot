@@ -13,7 +13,8 @@ import {
   BrainCircuit,
   Settings,
   Share2,
-  FileText
+  FileText,
+  Zap
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NeuralCore } from "@/components/NeuralCore";
