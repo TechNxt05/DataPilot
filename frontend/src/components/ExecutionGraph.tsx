@@ -80,9 +80,13 @@ export const ExecutionGraph: React.FC<ExecutionGraphProps> = ({ graph }) => {
         nodeTypes={nodeTypes}
         fitView
         className="bg-transparent"
+        minZoom={0.5}
+        maxZoom={2}
       >
-        <Background color="#1e293b" gap={20} />
-        <Controls showInteractive={false} className="bg-slate-900 border-white/10 fill-white" />
+        <Background variant={'dots' as any} color="#334155" gap={25} size={1} />
+        <Controls 
+          className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden [&_button]:border-white/5 [&_button]:fill-indigo-400 hover:[&_button]:bg-white/5 transition-all" 
+        />
       </ReactFlow>
     </div>
   );

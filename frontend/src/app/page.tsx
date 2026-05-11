@@ -169,8 +169,8 @@ export default function MissionControl() {
           </div>
 
           {/* Control Hub */}
-          <div className="h-24 bg-black/60 backdrop-blur-2xl border-t border-white/5 p-4 flex items-center gap-4">
-            <div className="relative flex-1">
+          <div className="bg-black/60 backdrop-blur-3xl border-t border-white/5 p-4 flex items-center gap-4">
+            <div className="relative flex-1 min-w-[300px]">
               <input 
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -180,29 +180,41 @@ export default function MissionControl() {
               <Command className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             </div>
             
-            <button 
-              onClick={() => runMission()}
-              disabled={loading || !sessionId}
-              className="px-6 h-12 rounded-xl bg-indigo-600 text-white font-bold text-sm flex items-center gap-2 hover:bg-indigo-500 transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] disabled:opacity-50"
-            >
-              <Zap className="w-4 h-4" /> Run Objective
-            </button>
-            
-            <button 
-              onClick={() => runMission(true)}
-              disabled={loading || !sessionId}
-              className="px-6 h-12 rounded-xl border border-white/10 text-white font-bold text-sm flex items-center gap-2 hover:bg-white/5 transition-all disabled:opacity-50"
-            >
-              <Sparkles className="w-4 h-4 text-amber-400" /> Discovery Mode
-            </button>
+            {/* Scrollable Action Bar */}
+            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide no-scrollbar flex-nowrap shrink-0">
+                <button 
+                  onClick={() => runMission()}
+                  disabled={loading || !sessionId}
+                  className="px-6 h-12 rounded-xl bg-indigo-600 text-white font-bold text-sm flex items-center gap-2 hover:bg-indigo-500 transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] disabled:opacity-50 whitespace-nowrap"
+                >
+                  <Zap className="w-4 h-4" /> Run Objective
+                </button>
+                
+                <button 
+                  onClick={() => runMission(true)}
+                  disabled={loading || !sessionId}
+                  className="px-6 h-12 rounded-xl border border-white/10 text-white font-bold text-sm flex items-center gap-2 hover:bg-white/5 transition-all disabled:opacity-50 whitespace-nowrap"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-400" /> Discovery Mode
+                </button>
 
-            <div className="relative">
-                <label className="cursor-pointer">
-                    <input type="file" className="hidden" onChange={handleUpload} />
-                    <div className="w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all">
-                        <UploadCloud className="w-5 h-5 text-gray-400" />
-                    </div>
-                </label>
+                <div className="h-8 w-px bg-white/5" />
+
+                <button 
+                  disabled={!insights.length}
+                  className="px-4 h-12 rounded-xl border border-white/10 text-gray-400 hover:text-white font-bold text-sm flex items-center gap-2 hover:bg-white/5 transition-all whitespace-nowrap"
+                >
+                  <FileText className="w-4 h-4" /> Export Strategic Report
+                </button>
+
+                <div className="relative shrink-0">
+                    <label className="cursor-pointer">
+                        <input type="file" className="hidden" onChange={handleUpload} />
+                        <div className="w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all">
+                            <UploadCloud className="w-5 h-5 text-gray-400" />
+                        </div>
+                    </label>
+                </div>
             </div>
           </div>
         </section>
