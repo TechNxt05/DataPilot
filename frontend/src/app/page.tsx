@@ -98,138 +98,168 @@ export default function MissionControl() {
   };
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-200 font-sans selection:bg-indigo-500/30 overflow-hidden flex flex-col">
+    <main className="h-screen bg-[#020617] text-slate-200 font-sans selection:bg-indigo-500/30 overflow-hidden flex flex-col relative">
+      {/* Dynamic Background Scanning Effect */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/[0.02] to-transparent pointer-events-none" />
+      
       {/* Cinematic Header */}
-      <header className="h-16 border-b border-white/5 bg-black/20 backdrop-blur-xl flex items-center justify-between px-6 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.5)]">
-            <Activity className="w-5 h-5 text-white" />
+      <header className="h-14 border-b border-white/[0.03] bg-black/40 backdrop-blur-2xl flex items-center justify-between px-6 z-50 shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-indigo-500 blur-md opacity-20 animate-pulse" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center relative shadow-lg">
+                <Activity className="w-5 h-5 text-white" />
+            </div>
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-tighter text-white uppercase tracking-widest">DataPilot AI</h1>
-            <p className="text-[10px] text-gray-500 font-mono">Neural Horizon OS v2.0</p>
+            <h1 className="text-xs font-black tracking-[0.2em] text-white uppercase">DataPilot <span className="text-indigo-400">AI</span></h1>
+            <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-[9px] text-gray-500 font-mono uppercase tracking-widest">Neural Horizon v2.0 // System Active</p>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-widest">Mission Protocol</span>
-            <span className="text-xs font-bold text-white uppercase tracking-widest">{agentState.state}</span>
+            <span className="text-[9px] font-mono text-indigo-400/60 uppercase tracking-[0.2em]">Current Protocol</span>
+            <span className="text-xs font-bold text-white uppercase tracking-widest leading-none mt-0.5">{agentState.state}</span>
           </div>
-          <div className="h-8 w-px bg-white/5" />
+          <div className="h-6 w-px bg-white/[0.05]" />
           <div className="flex gap-4">
-            <Settings className="w-4 h-4 text-gray-500 hover:text-white cursor-pointer transition-colors" />
-            <Share2 className="w-4 h-4 text-gray-500 hover:text-white cursor-pointer transition-colors" />
+            <Settings className="w-3.5 h-3.5 text-gray-500 hover:text-white cursor-pointer transition-colors" />
+            <Share2 className="w-3.5 h-3.5 text-gray-500 hover:text-white cursor-pointer transition-colors" />
           </div>
         </div>
       </header>
 
-      {/* Main Mission Control Workspace */}
+      {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* Left Sidebar - Thought Stream & Memory */}
-        <aside className="w-[350px] border-r border-white/5 bg-black/40 p-4 flex flex-col gap-4 overflow-hidden">
-          <div className="flex-1 overflow-hidden">
-            <ThoughtStream logs={logs} />
-          </div>
-          <div className="h-48 rounded-2xl border border-white/5 bg-black/20 p-4 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent" />
-            <div className="relative">
-                <div className="flex items-center gap-2 mb-3">
-                    <Database className="w-3 h-3 text-indigo-400" />
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Longitudinal Memory</span>
+        {/* Left Panel - Thought Stream */}
+        <aside className="w-[320px] border-r border-white/[0.03] bg-black/20 flex flex-col overflow-hidden">
+            <div className="p-4 border-b border-white/[0.03] flex items-center justify-between bg-white/[0.01]">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Thought Stream</span>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping" />
+                    <span className="text-[8px] text-indigo-400 font-mono">LIVE</span>
                 </div>
-                <p className="text-[10px] text-gray-600 leading-relaxed italic">
-                    Historical context synchronized. No prior anomalies detected in this cluster range.
-                </p>
             </div>
-          </div>
+            <div className="flex-1 overflow-y-auto scrollbar-hide">
+                <ThoughtStream logs={logs} />
+            </div>
+            <div className="p-4 bg-white/[0.02] border-t border-white/[0.03]">
+                <div className="flex items-center gap-2 mb-2">
+                    <Database className="w-3 h-3 text-indigo-400" />
+                    <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Memory Context</span>
+                </div>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/[0.03] text-[10px] text-gray-500 font-mono leading-relaxed italic">
+                    Dataset synchronized. Cluster topology mapped.
+                </div>
+            </div>
         </aside>
 
-        {/* Center - Execution & Visualization */}
-        <section className="flex-1 flex flex-col overflow-hidden bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-950/20 via-transparent to-transparent">
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+        {/* Center Canvas - The Neural Workspace */}
+        <section className="flex-1 flex flex-col overflow-hidden relative">
+          <div className="flex-1 overflow-y-auto p-8 space-y-12 scrollbar-hide pb-32">
             
             {/* Neural Core Centerpiece */}
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center relative">
+              <div className="absolute inset-0 bg-indigo-500/5 blur-[120px] rounded-full" />
               <NeuralCore state={agentState.state} />
             </div>
 
             {/* Execution Graph */}
-            <div className="relative">
+            <div className="relative max-w-5xl mx-auto w-full group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/10 to-transparent rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
                 <ExecutionGraph graph={graph} />
             </div>
 
-            {/* Interactive Charts Feed */}
-            <div className="grid grid-cols-2 gap-6">
+            {/* Dynamic Result Artifacts */}
+            <div className="grid grid-cols-2 gap-8 max-w-5xl mx-auto w-full pb-12">
                 {artifacts.map((art, idx) => (
-                    <InteractiveChart key={idx} data={art.chart} title={`Artifact: ${art.node_id}`} />
+                    <motion.div 
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="group relative"
+                    >
+                        <div className="absolute -inset-px bg-gradient-to-br from-indigo-500/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                        <InteractiveChart data={art.chart} title={`Neural Output: ${art.node_id}`} />
+                    </motion.div>
                 ))}
             </div>
           </div>
 
-          {/* Control Hub */}
-          <div className="bg-black/60 backdrop-blur-3xl border-t border-white/5 p-4 flex items-center gap-4">
-            <div className="relative flex-1 min-w-[300px]">
-              <input 
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Synchronize objective..."
-                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-12 text-sm focus:outline-none focus:border-indigo-500/50 transition-all font-mono"
-              />
-              <Command className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-            </div>
-            
-            {/* Scrollable Action Bar */}
-            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide no-scrollbar flex-nowrap shrink-0">
-                <button 
-                  onClick={() => runMission()}
-                  disabled={loading || !sessionId}
-                  className="px-6 h-12 rounded-xl bg-indigo-600 text-white font-bold text-sm flex items-center gap-2 hover:bg-indigo-500 transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] disabled:opacity-50 whitespace-nowrap"
-                >
-                  <Zap className="w-4 h-4" /> Run Objective
-                </button>
+          {/* Floating Control Hub - Cinematic Pill */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4 z-[100]">
+            <motion.div 
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="bg-black/40 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(79,70,229,0.1)] flex items-center gap-3"
+            >
+                <div className="relative flex-1">
+                    <input 
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Synchronize objective..."
+                        className="w-full h-11 bg-white/[0.03] border border-white/[0.05] rounded-xl px-12 text-sm focus:outline-none focus:border-indigo-500/50 transition-all font-mono placeholder:text-gray-600"
+                    />
+                    <Command className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                </div>
                 
-                <button 
-                  onClick={() => runMission(true)}
-                  disabled={loading || !sessionId}
-                  className="px-6 h-12 rounded-xl border border-white/10 text-white font-bold text-sm flex items-center gap-2 hover:bg-white/5 transition-all disabled:opacity-50 whitespace-nowrap"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-400" /> Discovery Mode
-                </button>
+                <div className="flex items-center gap-2 h-11 px-1">
+                    <button 
+                        onClick={() => runMission()}
+                        disabled={loading || !sessionId}
+                        className="h-9 px-5 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center gap-2 hover:bg-indigo-500 transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] disabled:opacity-30 whitespace-nowrap"
+                    >
+                        <Zap className="w-3.5 h-3.5" /> Execute
+                    </button>
+                    
+                    <button 
+                        onClick={() => runMission(true)}
+                        disabled={loading || !sessionId}
+                        className="h-9 px-5 rounded-lg border border-white/10 text-white font-bold text-xs flex items-center gap-2 hover:bg-white/5 transition-all disabled:opacity-30 whitespace-nowrap"
+                    >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Discovery
+                    </button>
 
-                <div className="h-8 w-px bg-white/5" />
+                    <div className="w-px h-6 bg-white/10 mx-1" />
 
-                <button 
-                  disabled={!insights.length}
-                  className="px-4 h-12 rounded-xl border border-white/10 text-gray-400 hover:text-white font-bold text-sm flex items-center gap-2 hover:bg-white/5 transition-all whitespace-nowrap"
-                >
-                  <FileText className="w-4 h-4" /> Export Strategic Report
-                </button>
-
-                <div className="relative shrink-0">
                     <label className="cursor-pointer">
                         <input type="file" className="hidden" onChange={handleUpload} />
-                        <div className="w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all">
-                            <UploadCloud className="w-5 h-5 text-gray-400" />
+                        <div className="w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-gray-500 hover:text-indigo-400">
+                            <UploadCloud className="w-4 h-4" />
                         </div>
                     </label>
                 </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* Right Sidebar - Insights & Hypotheses */}
-        <aside className="w-[400px] border-l border-white/5 bg-black/40 p-6 overflow-y-auto space-y-8 scrollbar-hide">
-          <HypothesisConsole hypotheses={hypotheses} />
-          <div className="h-px bg-white/5" />
-          <InsightFeed insights={insights} />
-          
-          {insights.length > 0 && (
-            <button className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                <FileText className="w-3 h-3" /> Export Strategic Report
-            </button>
-          )}
+        {/* Right Panel - Strategic Intelligence */}
+        <aside className="w-[380px] border-l border-white/[0.03] bg-black/20 flex flex-col overflow-hidden">
+            <div className="p-4 border-b border-white/[0.03] bg-white/[0.01]">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Strategic Intelligence</span>
+            </div>
+            <div className="flex-1 overflow-y-auto scrollbar-hide p-6 space-y-10 pb-12">
+                <HypothesisConsole hypotheses={hypotheses} />
+                <div className="h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
+                <InsightFeed insights={insights} />
+                
+                {insights.length > 0 && (
+                    <motion.button 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="w-full py-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] hover:bg-white/[0.05] hover:text-white transition-all flex items-center justify-center gap-3 group"
+                    >
+                        <FileText className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> 
+                        Generate Strategic Report
+                    </motion.button>
+                )}
+            </div>
         </aside>
 
       </div>
