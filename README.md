@@ -1,39 +1,49 @@
-# DataPilot AI – Architect Workspace Edition
+# DataPilot AI - Neural Horizon Edition
 
-DataPilot AI is an end-to-end multi-agent AI framework that allows you to directly connect datasets or database strings (MongoDB/SQL), visualize data structures, execute advanced Machine Learning models dynamically via an Agent Toolbox, and leverage conversational LLM reasoning over your datasets.
+DataPilot is a premium, autonomous data science mission control. It transforms raw datasets into deep strategic insights through a production-grade, self-healing agentic loop.
 
-## Key Features
-1. **Multi-Agent Architecture**: Discrete AI Agents specialized in data validation, correlation detection, dimensionality detection for Scikit-learn, and query generation.
-2. **Auto-Healing Reflection Loop**: Uniquely equipped with an internal `reflection_agent.py` that catches tracebacks if an AI process fails, syntactically generates a Python corrective snippet using `exec()` dynamically, and retries the process autonomously.
-3. **Multi-Pane UI Layout**: Built on Next.js, featuring an advanced Split-Panel Data Viewer grid, Sidebar Config, and Bottom Chatbox Overlay.
-4. **Resilient LLM Routing**: Auto-handles quota logic descending from standard `OpenAI` to `Gemini`, routing down to `Groq` and `Ollama`.
+## 🌌 The Neural Horizon Experience
 
-## 📂 Repository Structure
-- `agents/`: Contains specialized AI logic (Reflection, Detection, ML, Insight).
-- `core/`: Orchestration pipelines binding datasets to agents.
-- `connectors/`: Database hooks for native Pandas dataframe ingestion.
-- `api/main.py`: The Python FastAPI backend.
-- `frontend/`: The Next.js 14 and Tailwind CSS frontend dashboard.
+DataPilot v2.0 introduces an immersive, autonomous workspace designed for high-stakes data exploration.
 
----
+- **Neural Core Engine**: A dynamic AI visualization that pulses and shifts through states (Planning, Executing, Success, Failure) to reflect the agent's real-time cognitive activity.
+- **Interactive Holo-Charts**: Moving beyond static images. All visualizations are powered by Plotly, allowing for full interactivity (hover, zoom, slice) with a high-end holographic aesthetic.
+- **Autonomous Discovery Audit**: A one-click "Magic Wand" feature that allows the agent to deep-scan a dataset without any user prompt—automatically identifying anomalies, correlations, and business opportunities.
+- **Thought Stream (Chain of Thought)**: A real-time monologue panel that exposes the internal reasoning and decision-making logic of the ADS as it navigates the data pipeline.
+- **Self-Healing Loop**: If a code execution fails, the Reflection Agent automatically analyzes the trace and generates healing code to bypass bottlenecks.
 
-## 🚀 Running Locally
+## 🏗️ Technical Architecture
 
-You'll need two terminals. Ensure you copy `.env.example` to `.env` and fill in your API Keys (like `GROQ_API_KEY` or `GEMINI_API_KEY`).
+- **The Planner**: Translates ambiguous goals into high-fidelity JSON execution graphs.
+- **The Executor**: Runs Jupyter-style cells in a safe runtime environment.
+- **The Critic**: A high-confidence quality gate that scores every artifact and triggers retries on logic gaps.
+- **Memory Store**: Session-aware persistence for query history and multi-step state.
 
-**1. Start the API Backend (Python)**
+## 🛠️ Tech Stack
+
+- **Backend**: FastAPI, Pandas, Scikit-Learn, Plotly, LangGraph-inspired state loops.
+- **Intelligence**: Gemini Pro / GPT-4o / Groq / Ollama (Multi-model support).
+- **Frontend**: Next.js 15, Framer Motion, Tailwind CSS, React-Plotly.
+
+## 🚀 Getting Started
+
+### 1. Backend Synchronization
 ```bash
 pip install -r requirements.txt
 uvicorn api.main:app --reload
 ```
 
-**2. Start the Frontend (Next.js)**
-Open a second terminal and navigate to the frontend directory:
+### 2. Neural Frontend Initialization
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Navigate to `http://localhost:3000`.
+
+Visit `http://localhost:3000` to launch the Mission Control.
+
+---
+
+*Built with passion for autonomous intelligence.*
 
 
