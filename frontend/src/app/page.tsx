@@ -82,11 +82,13 @@ export default function Home() {
     return formData;
   };
 
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   const handleConnect = async () => {
     setConnecting(true);
     setErrorMsg(null);
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/ads/preview_data", buildFormData(), {
+      const response = await axios.post(`${API_BASE_URL}/api/ads/preview_data`, buildFormData(), {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (response.data.error) setErrorMsg(response.data.error);
@@ -119,7 +121,7 @@ export default function Home() {
       sql_connection_string: sourceType === "sql" ? dbUri : "",
     });
 
-    const eventSource = new EventSource(`http://127.0.0.1:8000/api/ads/stream?${params.toString()}`);
+    const eventSource = new EventSource(`${API_BASE_URL}/api/ads/stream?${params.toString()}`);
     
     eventSource.onmessage = (event) => {
       const payload = JSON.parse(event.data);
