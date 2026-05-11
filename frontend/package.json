@@ -14,7 +14,7 @@
     "axios": "^1.14.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
-    "next": "15.4.0",
+    "next": "latest",
     "plotly.js": "^3.5.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -28,7 +28,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.4.0",
+    "eslint-config-next": "latest",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
