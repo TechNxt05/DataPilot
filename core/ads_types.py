@@ -1,57 +1,70 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 
 
-class ExecutionStep(BaseModel):
-    step_id: str
+class AgentStatus(BaseModel):
+    agent_id: str
+    state: Literal["idle", "planning", "executing", "debating", "healing", "success", "failure"] = "idle"
+    message: str = ""
+    timestamp: float = 0.0
+
+
+class ExecutionNode(BaseModel):
+    id: str
+    type: str = "task"
     title: str
     description: str
-    tool: Literal[
-        "eda",
-        "feature_engineering",
-        "visualization",
-        "sql",
-        "ml_experiment",
-        "insight_generation",
-        "python",
-    ] = "python"
-    expected_output: str = ""
+    tool: str
+    dependencies: List[str] = Field(default_factory=list)
+    status: Literal["pending", "running", "success", "error", "healed", "skipped"] = "pending"
+    owner: str = "ExecutorAgent"
+    output_preview: Optional[str] = None
+    confidence: float = 1.0
 
 
-class ExecutionPlan(BaseModel):
-    goal: str
-    inferred_task_type: Literal["analysis", "regression", "classification", "query", "eda"] = "analysis"
-    steps: List[ExecutionStep] = Field(default_factory=list)
-    assumptions: List[str] = Field(default_factory=list)
+class ExecutionGraph(BaseModel):
+    nodes: List[ExecutionNode] = Field(default_factory=list)
+    edges: List[Dict[str, str]] = Field(default_factory=list)
 
 
 class ExecutionCell(BaseModel):
     cell_id: str
-    step_id: str
-    title: str
+    node_id: str
     code: str
-    language: str = "python"
-    status: Literal["pending", "running", "success", "error", "critic_retry"] = "pending"
+    status: str = "pending"
     stdout: str = ""
     error: Optional[str] = None
     artifacts: Dict[str, Any] = Field(default_factory=dict)
     logs: List[str] = Field(default_factory=list)
-    critic_feedback: Optional[str] = None
+    reflection: Optional[str] = None
 
 
-class CriticVerdict(BaseModel):
-    should_retry: bool = False
-    reason: str = ""
-    suggested_patch: str = ""
-    confidence: float = 0.5
+class Hypothesis(BaseModel):
+    id: str
+    statement: str
+    explanation: str
+    confidence: float
+    evidence: List[str] = Field(default_factory=list)
+    conflicting_evidence: List[str] = Field(default_factory=list)
+    status: Literal["proposed", "validated", "rejected"] = "proposed"
+
+
+class StrategicReport(BaseModel):
+    title: str
+    summary: str
+    key_findings: List[str] = Field(default_factory=list)
+    recommendations: List[str] = Field(default_factory=list)
+    artifacts: List[str] = Field(default_factory=list)
 
 
 class ADSRunResponse(BaseModel):
-    status: Literal["success", "partial_success", "error"]
-    plan: ExecutionPlan
-    cells: List[ExecutionCell]
-    insights: List[str] = Field(default_factory=list)
-    memory: Dict[str, Any] = Field(default_factory=dict)
+    session_id: str
+    status: str
+    graph: ExecutionGraph
+    cells: List[ExecutionCell] = Field(default_factory=list)
+    hypotheses: List[Hypothesis] = Field(default_factory=list)
+    report: Optional[StrategicReport] = None
+    agent_states: List[AgentStatus] = Field(default_factory=list)
     logs: List[str] = Field(default_factory=list)

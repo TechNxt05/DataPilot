@@ -1,43 +1,39 @@
 from __future__ import annotations
 import json
-from core.ads_types import CriticVerdict, ExecutionCell
+from typing import Dict, Any
+from core.ads_types import ExecutionCell
 from llm.model_router import query_llm
 
+class CriticAgent:
+    def __init__(self):
+        self.agent_id = "CriticAgent"
 
-def evaluate_cell(cell: ExecutionCell) -> CriticVerdict:
-    if cell.status == "error":
-        return CriticVerdict(
-            should_retry=True,
-            reason=f"Cell failed with runtime error: {cell.error}",
-            suggested_patch="Add null-safe operations and explicit column checks before transformation.",
-            confidence=0.95,
-        )
+    def evaluate_cell(self, cell: ExecutionCell) -> Dict[str, Any]:
+        if cell.status == "error":
+            return {
+                "should_retry": True,
+                "reason": f"Execution failed: {cell.error}",
+                "patch": "Analyze the stack trace and fix the logic.",
+                "confidence": 0.0
+            }
 
-    # Use LLM for semantic critique
-    try:
-        context = {
-            "title": cell.title,
-            "status": cell.status,
-            "stdout": cell.stdout[:1000],
-            "artifacts_keys": list(cell.artifacts.keys()),
-        }
-        
         prompt = (
-            "You are a Senior ADS Quality Critic. Evaluate this execution cell for technical rigor.\n"
-            "If the output is empty or lacks depth, mark 'should_retry': true.\n"
-            "Return JSON: {'should_retry': bool, 'reason': str, 'suggested_patch': str, 'confidence': float}"
+            "You are a Senior Data Science Critic. Evaluate the technical rigor and validity of this execution.\n"
+            "If the results look empty, statistically suspicious, or depth-less, mark 'should_retry': true.\n"
+            "Return JSON: {'should_retry': bool, 'reason': str, 'patch': str, 'confidence': float}"
         )
-        
-        response = query_llm(prompt, f"Cell Context: {context}")
-        parsed = json.loads(response)
-        return CriticVerdict(**parsed)
-    except Exception:
-        # Fallback to simple logic
-        if cell.status == "success" and not cell.stdout.strip() and not cell.artifacts:
-            return CriticVerdict(
-                should_retry=True,
-                reason="No evidence of execution output.",
-                suggested_patch="Emit structured logs and attach artifacts.",
-                confidence=0.65,
-            )
-        return CriticVerdict(should_retry=False, reason="Execution appears correct.", confidence=0.8)
+
+        context = {
+            "node_id": cell.node_id,
+            "code": cell.code,
+            "stdout": cell.stdout[:1000],
+            "artifacts_keys": list(cell.artifacts.keys())
+        }
+
+        try:
+            response = query_llm(prompt, json.dumps(context))
+            if "```json" in response:
+                response = response.split("```json")[1].split("```")[0].strip()
+            return json.loads(response)
+        except:
+            return {"should_retry": False, "reason": "Evaluation skipped.", "patch": "", "confidence": 0.8}

@@ -3,112 +3,66 @@ from __future__ import annotations
 import json
 from typing import Dict, List
 import pandas as pd
-
-from core.ads_types import ExecutionPlan, ExecutionStep
+from core.ads_types import ExecutionGraph, ExecutionNode
 from llm.model_router import query_llm
 
 
-def build_plan(user_query: str, df: pd.DataFrame, schema: Dict[str, str]) -> ExecutionPlan:
-    lowered = user_query.lower()
-    is_audit = any(token in lowered for token in ["audit", "deep-dive", "discovery", "magic wand"])
-    
-    base_steps: List[ExecutionStep] = [
-        ExecutionStep(
-            step_id="s1",
-            title="Intelligent Data Profiling",
-            description="Perform deep schema inspection and statistical distribution analysis.",
-            tool="eda",
-            expected_output="comprehensive data profile",
-        ),
-        ExecutionStep(
-            step_id="s2",
-            title="Automated Data Cleaning",
-            description="Handle missing values, identify outliers, and normalize distributions.",
-            tool="feature_engineering",
-            expected_output="cleaned dataframe",
-        ),
-        ExecutionStep(
-            step_id="s3",
-            title="Strategic Visualization",
-            description="Generate high-impact Plotly visualizations for key data relationships.",
-            tool="visualization",
-            expected_output="interactive charts",
-        ),
-    ]
+class PlannerAgent:
+    def __init__(self):
+        self.agent_id = "PlannerAgent"
 
-    inferred = "analysis"
-    if is_audit:
-        inferred = "eda"
-        base_steps.append(
-            ExecutionStep(
-                step_id="s4",
-                title="Correlation & Dependency Mapping",
-                description="Analyze feature interactions and identify key business drivers.",
-                tool="ml_experiment",
-                expected_output="correlation matrix and driver analysis",
-            )
-        )
-    elif any(token in lowered for token in ["predict", "forecast", "regression"]):
-        inferred = "regression"
-        base_steps.append(
-            ExecutionStep(
-                step_id="s4",
-                title="Predictive Modeling Suite",
-                description="Train and compare multiple regression models for target estimation.",
-                tool="ml_experiment",
-                expected_output="model performance leaderboard",
-            )
-        )
-    elif any(token in lowered for token in ["classify", "churn", "risk", "segment"]):
-        inferred = "classification"
-        base_steps.append(
-            ExecutionStep(
-                step_id="s4",
-                title="Classification Framework",
-                description="Execute classification algorithms and evaluate decision boundaries.",
-                tool="ml_experiment",
-                expected_output="classification metrics and confusion matrix",
-            )
+    def build_graph(self, user_query: str, df: pd.DataFrame, schema: Dict[str, str]) -> ExecutionGraph:
+        prompt = (
+            "You are the Lead Strategic Planner for DataPilot AI. "
+            "Your goal is to decompose a user request into a high-fidelity execution DAG (Directed Acyclic Graph).\n\n"
+            "Rules:\n"
+            "1. Identify the core intent (EDA, Forecasting, Anomaly Detection, Hypothesis Testing).\n"
+            "2. Define tasks as nodes with specific 'tool' types (eda, cleaning, viz, model, forecast, anomaly, report).\n"
+            "3. Define dependencies between nodes (e.g., viz depends on cleaning).\n"
+            "4. For complex requests, branch the analysis (e.g., run regional and temporal analysis in parallel).\n\n"
+            "Return ONLY a JSON object:\n"
+            "{\n"
+            "  'nodes': [\n"
+            "    {'id': 'n1', 'title': '...', 'description': '...', 'tool': '...', 'dependencies': []}\n"
+            "  ],\n"
+            "  'edges': [\n"
+            "    {'source': 'n1', 'target': 'n2'}\n"
+            "  ]\n"
+            "}"
         )
 
-    if any(token in lowered for token in ["sql", "database", "top", "customers"]):
-        inferred = "query"
-        base_steps.append(
-            ExecutionStep(
-                step_id="s_sql",
-                title="Neural SQL Synthesis",
-                description="Convert natural language to optimized SQL and execute on data source.",
-                tool="sql",
-                expected_output="structured query result",
-            )
-        )
+        context = {
+            "query": user_query,
+            "df_info": f"Rows: {len(df)}, Columns: {list(df.columns)}",
+            "schema": schema
+        }
 
-    base_steps.append(
-        ExecutionStep(
-            step_id="s_final",
-            title="Strategic Insight Narration",
-            description="Synthesize all findings into a high-level business narrative.",
-            tool="insight_generation",
-            expected_output="executive summary",
-        )
-    )
+        response = query_llm(prompt, json.dumps(context))
+        
+        try:
+            # Simple cleaning in case of markdown blocks
+            clean_res = response.strip()
+            if "```json" in clean_res:
+                clean_res = clean_res.split("```json")[1].split("```")[0].strip()
+            
+            data = json.loads(clean_res)
+            
+            nodes = [ExecutionNode(**n) for n in data.get("nodes", [])]
+            return ExecutionGraph(nodes=nodes, edges=data.get("edges", []))
+        except Exception as e:
+            # Fallback to basic linear graph if LLM fails
+            return self._get_fallback_graph(user_query)
 
-    # Optional LLM shaping for better assumptions
-    assumptions: List[str] = [f"Input dataset initialized with {len(df)} rows and {len(df.columns)} features."]
-    try:
-        response = query_llm(
-            "Return JSON object with key 'assumptions' (array of 3-5 short strings).",
-            f"User request: {user_query}\nSchema: {schema}\nContext: {'Autonomous Discovery Audit' if is_audit else 'Standard Query'}",
-        )
-        parsed = json.loads(response)
-        if isinstance(parsed, dict) and isinstance(parsed.get("assumptions"), list):
-            assumptions.extend([str(x) for x in parsed["assumptions"][:4]])
-    except Exception:
-        pass
-
-    return ExecutionPlan(
-        goal=user_query,
-        inferred_task_type=inferred,  # type: ignore[arg-type]
-        steps=base_steps,
-        assumptions=assumptions,
-    )
+    def _get_fallback_graph(self, query: str) -> ExecutionGraph:
+        nodes = [
+            ExecutionNode(id="n1", title="Data Profiling", description="Statistical overview of the dataset.", tool="eda"),
+            ExecutionNode(id="n2", title="Cleaning", description="Handling missing values and anomalies.", tool="cleaning", dependencies=["n1"]),
+            ExecutionNode(id="n3", title="Viz", description="Generating interactive holographic charts.", tool="viz", dependencies=["n2"]),
+            ExecutionNode(id="n4", title="Final Report", description="Synthesizing insights.", tool="report", dependencies=["n3"])
+        ]
+        edges = [
+            {"source": "n1", "target": "n2"},
+            {"source": "n2", "target": "n3"},
+            {"source": "n3", "target": "n4"}
+        ]
+        return ExecutionGraph(nodes=nodes, edges=edges)

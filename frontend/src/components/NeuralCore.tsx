@@ -1,102 +1,101 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface NeuralCoreProps {
-  status: "idle" | "planning" | "executing" | "success" | "error";
+  state: "idle" | "planning" | "executing" | "debating" | "healing" | "success" | "failure";
 }
 
-export const NeuralCore: React.FC<NeuralCoreProps> = ({ status }) => {
-  const getColors = () => {
-    switch (status) {
-      case "planning":
-        return ["#818cf8", "#c084fc"]; // Indigo to Purple
-      case "executing":
-        return ["#22d3ee", "#818cf8"]; // Cyan to Indigo
-      case "success":
-        return ["#34d399", "#22d3ee"]; // Emerald to Cyan
-      case "error":
-        return ["#f87171", "#fb923c"]; // Red to Orange
-      default:
-        return ["#475569", "#1e293b"]; // Slate
+export const NeuralCore: React.FC<NeuralCoreProps> = ({ state }) => {
+  const getCoreColor = () => {
+    switch (state) {
+      case 'planning': return 'from-indigo-500 to-purple-500';
+      case 'executing': return 'from-amber-400 to-orange-600';
+      case 'debating': return 'from-rose-500 to-pink-600';
+      case 'healing': return 'from-cyan-400 to-emerald-500';
+      case 'success': return 'from-emerald-400 to-teal-600';
+      case 'failure': return 'from-rose-600 to-red-800';
+      default: return 'from-slate-700 to-slate-900';
     }
   };
 
-  const colors = getColors();
-
   return (
     <div className="relative w-32 h-32 flex items-center justify-center">
-      {/* Outer Rings */}
-      {[1, 2, 3].map((i) => (
+      {/* Background Glow */}
+      <AnimatePresence mode="wait">
         <motion.div
-          key={i}
-          className="absolute inset-0 rounded-full border border-white/10"
+          key={state}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.2, scale: 1.2 }}
+          exit={{ opacity: 0, scale: 1.5 }}
+          className={`absolute inset-0 rounded-full bg-gradient-to-br ${getCoreColor()} blur-3xl`}
+        />
+      </AnimatePresence>
+
+      {/* Main Pulse Orbs */}
+      <div className="relative w-16 h-16">
+        <motion.div
           animate={{
-            rotate: 360 * i,
             scale: [1, 1.1, 1],
-            opacity: [0.1, 0.3, 0.1],
+            rotate: 360,
           }}
           transition={{
-            duration: 10 / i,
+            duration: 8,
             repeat: Infinity,
-            ease: "linear",
+            ease: "linear"
           }}
-        />
-      ))}
+          className={`w-full h-full rounded-full border-2 border-white/10 p-1`}
+        >
+          <div className={`w-full h-full rounded-full bg-gradient-to-br ${getCoreColor()} shadow-[0_0_20px_rgba(99,102,241,0.5)]`} />
+        </motion.div>
 
-      {/* The Core */}
-      <motion.div
-        className="w-16 h-16 rounded-full blur-xl"
-        animate={{
-          scale: status === "idle" ? [1, 1.1, 1] : [1, 1.3, 1],
-          backgroundColor: colors[0],
-        }}
-        transition={{
-          duration: status === "idle" ? 3 : 1,
-          repeat: Infinity,
-        }}
-      />
+        {/* Orbitals */}
+        <AnimatePresence>
+            {state !== 'idle' && (
+                <>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1, rotate: 360 }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-[-10px] border border-dashed border-indigo-500/30 rounded-full"
+                    />
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1, rotate: -360 }}
+                        transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-[-20px] border border-white/5 rounded-full"
+                    />
+                </>
+            )}
+        </AnimatePresence>
+        
+        {/* State Indicator Particle */}
+        <motion.div
+            layoutId="particle"
+            className={`absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_white]`}
+            animate={{
+                x: state === 'idle' ? 0 : [20, -20, 20],
+                y: state === 'idle' ? 0 : [-20, 20, -20],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+        />
+      </div>
       
-      <motion.div
-        className="absolute w-12 h-12 rounded-full z-10 flex items-center justify-center overflow-hidden bg-black/40 backdrop-blur-md border border-white/20 shadow-2xl"
-        animate={{
-          boxShadow: `0 0 20px ${colors[0]}`,
-          borderColor: colors[1],
-        }}
-      >
-        <motion.div
-          className="w-4 h-4 rounded-full"
-          animate={{
-            backgroundColor: colors[0],
-            scale: [1, 1.5, 1],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-          }}
-        />
-      </motion.div>
-
-      {/* Floating Particles */}
-      {status !== "idle" && [1, 2, 3, 4, 5].map((i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full"
-          initial={{ opacity: 0, x: 0, y: 0 }}
-          animate={{
-            opacity: [0, 1, 0],
-            x: (Math.random() - 0.5) * 100,
-            y: (Math.random() - 0.5) * 100,
-            backgroundColor: colors[i % 2],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            delay: i * 0.4,
-          }}
-        />
-      ))}
+      {/* State Label */}
+      <div className="absolute -bottom-8 w-full text-center">
+        <AnimatePresence mode="wait">
+            <motion.span
+                key={state}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="text-[10px] font-mono text-gray-500 uppercase tracking-[0.2em]"
+            >
+                {state}
+            </motion.span>
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

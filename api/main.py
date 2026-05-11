@@ -5,13 +5,11 @@ import json
 import uvicorn
 import asyncio
 
-from core.pipeline import DataPilotPipeline
 from core.ads_orchestrator import ADSOrchestrator
 from core.memory import memory_store
 from connectors.file_loader import load_file_into_dataframe
-from database.mongodb import connect_to_mongo, close_mongo_connection
 
-app = FastAPI(title="DataPilot AI API", version="1.0.0")
+app = FastAPI(title="DataPilot AI — Neural Horizon OS", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,16 +19,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-pipeline = DataPilotPipeline()
 ads_orchestrator = ADSOrchestrator()
 
 @app.on_event("startup")
 async def startup_event():
-    await connect_to_mongo()
+    # In a real app, initialize DB tables here
+    pass
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await close_mongo_connection()
+    pass
 
 from connectors.mongo_connector import load_from_mongodb
 from connectors.sql_connector import load_from_sql
@@ -185,6 +183,53 @@ async def ads_stream_endpoint(
             if run_task.done() and queue.empty():
                 result = run_task.result().model_dump()
                 yield "data: " + json.dumps({"type": "final", "payload": result}) + "\n\n"
+                break
+            try:
+                event = await asyncio.wait_for(queue.get(), timeout=0.5)
+                yield "data: " + json.dumps(event) + "\n\n"
+            except asyncio.TimeoutError:
+                continue
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.post("/api/ads/discovery")
+async def ads_discovery_endpoint(session_id: str = Form(...)):
+    memory = memory_store.get_session(session_id)
+    if memory is None or memory.dataframe is None:
+        return {"error": "Invalid session"}
+    
+    # Trigger autonomous discovery
+    prompt = "Perform a deep autonomous discovery audit. Identify anomalies, generate strategic hypotheses, and forecast key metrics."
+    
+    response = await ads_orchestrator.run(
+        session_id=session_id,
+        user_query=prompt,
+        df=memory.dataframe
+    )
+    return response.model_dump()
+
+@app.get("/api/ads/discovery/stream")
+async def ads_discovery_stream_endpoint(session_id: str):
+    memory = memory_store.get_session(session_id)
+    if memory is None or memory.dataframe is None:
+        async def err(): yield "data: " + json.dumps({"type": "error", "payload": "Invalid session"}) + "\n\n"
+        return StreamingResponse(err(), media_type="text/event-stream")
+
+    queue: asyncio.Queue = asyncio.Queue()
+    prompt = "Perform a deep autonomous discovery audit. Identify anomalies, generate strategic hypotheses, and forecast key metrics."
+
+    async def event_generator():
+        run_task = asyncio.create_task(
+            ads_orchestrator.run(
+                session_id=session_id,
+                user_query=prompt,
+                df=memory.dataframe,
+                stream_callback=lambda e: queue.put_nowait(e),
+            )
+        )
+        while True:
+            if run_task.done() and queue.empty():
+                yield "data: " + json.dumps({"type": "final", "payload": run_task.result().model_dump()}) + "\n\n"
                 break
             try:
                 event = await asyncio.wait_for(queue.get(), timeout=0.5)
